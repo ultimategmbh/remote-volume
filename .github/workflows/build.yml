@@ -27,3 +27,34 @@ jobs:
         with:
           github_token: ${{ secrets.GH_TOKEN }}
           release: true
+
+      - name: Get latest release draft
+        id: get_release
+        run: |
+          release_info=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/drafts" | \
+            jq '.[0]')
+          echo "release_id=$(echo $release_info | jq -r .id)" >> $GITHUB_ENV
+          echo "upload_url=$(echo $release_info | jq -r .upload_url | sed "s/{?name,label}//")" >> $GITHUB_ENV
+
+      - name: Remove unwanted files from draft release
+        run: |
+          echo "Cleaning up release files..."
+          # Get the list of assets from the draft release
+          assets=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/${{ env.release_id }}/assets")
+
+          # Filter and delete assets with .yml and .blockmap extensions
+          echo "$assets" | jq -r '.[] | select(.name | endswith(".yml") or endswith(".blockmap")) | .id' | while read asset_id; do
+            echo "Deleting asset with ID: $asset_id"
+            curl -X DELETE -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id"
+          done
+
+      - name: Publish release
+        run: |
+          echo "Publishing the release..."
+          curl -X PATCH -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"draft": false}' \
+            "https://api.github.com/repos/${{ github.repository }}/releases/${{ env.release_id }}"
