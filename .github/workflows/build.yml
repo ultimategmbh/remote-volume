@@ -1,0 +1,124 @@
+name: Build and Release Electron App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-macos:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Ensure this is compatible with Electron
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build for macOS
+        run: npm run build # Customize this as needed to build your app
+
+      - name: Package Electron app for macOS
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx electron-builder --mac
+
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: electron-app-macos
+          path: dist/*
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build for Windows
+        run: npm run build # Customize this as needed to build your app
+
+      - name: Package Electron app for Windows
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx electron-builder --win
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: electron-app-windows
+          path: dist/*
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build for Linux
+        run: npm run build # Customize this as needed to build your app
+
+      - name: Package Electron app for Linux
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx electron-builder --linux
+
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: electron-app-linux
+          path: dist/*
+
+  release:
+    needs: [build-macos, build-windows, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download macOS Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: electron-app-macos
+
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: electron-app-windows
+
+      - name: Download Linux Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: electron-app-linux
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          tag: v${{ github.run_number }}
+          release_name: 'Release v${{ github.run_number }}'
+          body: 'Automated build release for Electron app'
+          draft: false
+          prerelease: false
+          artifacts: dist/*
