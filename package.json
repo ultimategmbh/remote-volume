@@ -1,0 +1,40 @@
+{
+	"name": "volume-controller",
+	"version": "1.0.0",
+	"description": "",
+	"main": "main.js",
+	"keywords": [],
+	"scripts": {
+		"start": "electron .",
+		"build": "electron-builder"
+	},
+	"build": {
+		"appId": "com.utsgmbh.volumecontroller",
+		"mac": {
+			"target": [
+				"dmg",
+				"zip"
+			]
+		},
+		"win": {
+			"target": [
+				"nsis"
+			],
+			"icon": "icon.png"
+		}
+	},
+	"author": "",
+	"license": "MIT",
+	"dependencies": {
+		"auto-launch": "^5.0.6",
+		"execa": "4.0.3",
+		"os": "^0.1.2",
+		"ws": "^8.18.0"
+	},
+	"devDependencies": {
+		"electron": "^33.0.2",
+		"electron-builder": "^25.1.8",
+		"mocha": "^8.1.1",
+		"standard": "^14.3.4"
+	}
+}

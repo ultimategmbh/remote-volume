@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Volume Controller</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Change font for better aesthetics */
+        background-color: #121212; /* Dark background */
+        color: #ffffff; /* White text */
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Full viewport height */
+        overflow: hidden;
+      }
+
+      .container {
+        background-color: #1e1e1e; /* Card background */
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Shadow effect */
+        width: 100%;
+        max-width: 400px; /* Maximum width for the card */
+        text-align: center; /* Center text */
+      }
+
+      h1 {
+        color: #bb86fc; /* Purple color for the heading */
+        margin-bottom: 20px; /* Space below heading */
+      }
+
+      label {
+        display: block;
+        margin: 15px 0 5px;
+        font-weight: bold; /* Bold labels for better readability */
+      }
+
+      input[type="number"],
+      input[type="checkbox"] {
+        margin-top: 5px;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #333333; /* Input background */
+        color: #ffffff;
+        width: calc(100% - 20px); /* Adjust width to fit padding */
+        font-size: 16px; /* Larger font for better readability */
+        transition: background-color 0.3s ease; /* Smooth background transition */
+      }
+
+      input[type="checkbox"] {
+        width: auto; /* Checkbox should not stretch */
+        margin-right: 10px; /* Space between checkbox and label */
+      }
+
+      input[type="number"]:focus,
+      input[type="checkbox"]:focus {
+        outline: none; /* Remove default outline */
+        background-color: #444444; /* Darker background on focus */
+      }
+
+      button {
+        background-color: #bb86fc; /* Button color */
+        color: #ffffff; /* Button text color */
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+        width: 100%; /* Full-width button */
+        font-size: 16px; /* Larger font */
+        margin-top: 20px; /* Space above button */
+      }
+
+      button:hover {
+        background-color: #9b59b6; /* Darker purple on hover */
+        transform: translateY(-2px); /* Lift effect on hover */
+      }
+
+      input[disabled] {
+        background-color: #444444; /* Dark gray for disabled inputs */
+      }
+
+      /* Responsive styles */
+      @media (max-width: 600px) {
+        .container {
+          padding: 20px; /* Adjust padding for smaller screens */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Volume Controller</h1>
+      <label for="port">WebSocket Port:</label>
+      <input type="number" id="port" value="8080" />
+      <br />
+      <label for="runOnStartup">
+        <input type="checkbox" id="runOnStartup" />
+        Run on Startup
+      </label>
+      <br />
+      <label for="enablePolling">
+        <input type="checkbox" id="enablePolling" />
+        Enable Polling
+      </label>
+      <br />
+      <label for="pollingInterval">Polling Interval (ms):</label>
+      <input type="number" id="pollingInterval" value="1000" disabled />
+      <br />
+      <button id="save">Save</button>
+    </div>
+
+    <script>
+      // Load current configuration from the main process
+      window.electron.receive("load-config", (config) => {
+        document.getElementById("port").value = config.websocket.port;
+        document.getElementById("runOnStartup").checked = config.runOnStartup;
+        document.getElementById("enablePolling").checked =
+          config.polling.enabled;
+        document.getElementById("pollingInterval").value =
+          config.polling.interval;
+        document.getElementById("pollingInterval").disabled =
+          !config.polling.enabled;
+      });
+
+      const saveConfig = () => {
+        const port = parseInt(document.getElementById("port").value, 10);
+        const runOnStartup = document.getElementById("runOnStartup").checked;
+        const enablePolling = document.getElementById("enablePolling").checked;
+        const pollingInterval = enablePolling
+          ? parseInt(document.getElementById("pollingInterval").value, 10)
+          : null;
+
+        console.log("Save button clicked!"); // Debug log
+        console.log(
+          `Sending config: { port: ${port}, runOnStartup: ${runOnStartup}, polling: { enabled: ${enablePolling}, interval: ${pollingInterval} } }`
+        ); // Debug log
+
+        // Send the new config to the main process
+        window.electron.send("save-config", {
+          websocket: { port },
+          runOnStartup,
+          polling: { enabled: enablePolling, interval: pollingInterval },
+        });
+      };
+
+      document.getElementById("save").addEventListener("click", saveConfig);
+
+      // Add event listener for Enter key in the input field
+      document.getElementById("port").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          saveConfig(); // Call the saveConfig function if Enter is pressed
+        }
+      });
+
+      // Enable/disable polling interval input based on the checkbox
+      document
+        .getElementById("enablePolling")
+        .addEventListener("change", (event) => {
+          document.getElementById("pollingInterval").disabled =
+            !event.target.checked;
+        });
+    </script>
+  </body>
+</html>
