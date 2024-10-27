@@ -27,7 +27,7 @@ jobs:
       - name: Package Electron app for macOS
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --mac
+        run: npx electron-builder --mac --publish=never
 
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v3
@@ -56,7 +56,7 @@ jobs:
       - name: Package Electron app for Windows
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --win
+        run: npx electron-builder --win --publish=never
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v3
@@ -85,7 +85,7 @@ jobs:
       - name: Package Electron app for Linux
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --linux
+        run: npx electron-builder --linux --publish=never
 
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v3
