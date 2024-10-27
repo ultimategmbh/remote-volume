@@ -1,39 +1,41 @@
-const childProcess = require("child_process");
-const path = require("path");
-const util = require("util");
+import { execFile } from 'child_process'
+import path from 'path'
+import { promisify } from 'util'
 
-const execFile = util.promisify(childProcess.execFile);
 const executablePath = path.join(
-  __dirname,
-  "adjust_get_current_system_volume_vista_plus.exe"
-);
+	import.meta.url.split('/').slice(0, -1).join('/'),
+	'adjust_get_current_system_volume_vista_plus.exe'
+)
+
+const execFileAsync = promisify(execFile)
 
 async function runProgram(...args) {
-  return (await execFile(executablePath, args)).stdout;
+	const { stdout } = await execFileAsync(executablePath, args)
+	return stdout
 }
 
 async function getVolumeInfo() {
-  const data = await runProgram();
-  const args = data.split(" ");
+	const data = await runProgram()
+	const args = data.split(' ')
 
-  return {
-    volume: parseInt(args[0], 10),
-    muted: Boolean(parseInt(args[1], 10)),
-  };
+	return {
+		volume: parseInt(args[0], 10),
+		muted: Boolean(parseInt(args[1], 10)),
+	}
 }
 
-exports.getVolume = async function getVolume() {
-  return (await getVolumeInfo()).volume;
-};
+export const getVolume = async () => {
+	return (await getVolumeInfo()).volume
+}
 
-exports.setVolume = async function setVolume(val) {
-  await runProgram(String(val));
-};
+export const setVolume = async (val) => {
+	await runProgram(String(val))
+}
 
-exports.getMuted = async function getMuted() {
-  return (await getVolumeInfo()).muted;
-};
+export const getMuted = async () => {
+	return (await getVolumeInfo()).muted
+}
 
-exports.setMuted = async function setMuted(val) {
-  await runProgram(val ? "mute" : "unmute");
-};
+export const setMuted = async (val) => {
+	await runProgram(val ? 'mute' : 'unmute')
+}
