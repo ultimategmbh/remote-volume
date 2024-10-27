@@ -17,10 +17,6 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
-      - name: get-npm-version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
-
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
@@ -36,7 +32,7 @@ jobs:
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ secrets.GH_TOKEN }}
-          tag: ${{ steps.package-version.outputs.current-version}}
+          tag: 'v1.0.0'
           assets: |
             *.yml
             *.blockmap
@@ -46,4 +42,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          release_id: ${{ steps.package-version.outputs.current-version}}
+          release_id: 'v1.0.0'
