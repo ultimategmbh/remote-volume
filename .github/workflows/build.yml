@@ -19,7 +19,7 @@ jobs:
 
       - name: Get tag name
         id: get_tag
-        run: echo "TAG_NAME=${{ github.ref_name }} >> $GITHUB_ENV
+        run: echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
