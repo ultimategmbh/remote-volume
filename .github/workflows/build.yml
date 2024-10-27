@@ -17,9 +17,9 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
-      - name: Get tag name
-        id: get_tag
-        run: echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
@@ -36,7 +36,7 @@ jobs:
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ secrets.GH_TOKEN }}
-          tag: ${{ env.TAG_NAME }}
+          tag: ${{ steps.package-version.outputs.current-version}}
           assets: |
             *.yml
             *.blockmap
@@ -46,4 +46,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          release_id: ${{ env.TAG_NAME }}
+          release_id: ${{ steps.package-version.outputs.current-version}}
