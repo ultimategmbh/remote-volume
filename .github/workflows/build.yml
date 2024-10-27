@@ -1,38 +1,49 @@
-name: Build/release
+name: Build and Release Electron App
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*' # Trigger on version tags (e.g., v1.0.0)
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
+  build:
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest] # Build for Linux, Windows, and macOS
 
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v1
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: 22
+          node-version: '22' # Adjust this to your Node.js version
 
-      - name: Build/release Electron app
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          github_token: ${{ secrets.GH_TOKEN }}
-          release: true
+      - name: Install dependencies
+        run: npm install
 
-      - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
+      - name: Build Electron app
+        run: npm run build # Adjust this to your build command
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
         with:
-          token: ${{ secrets.GH_TOKEN }}
-          tag: ${GITHUB_REF#refs/tags/}
-          assets: |
-            *.yml
-            *.blockmap
+          tag_name: ${{ github.ref_name }}
+          files: |
+            ./dist/**  # Adjust this to your build output directory
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Remove unwanted files from release
+        run: |
+          echo "Cleaning up release artifacts..."
+          for file in $(echo "${{ steps.create_release.outputs.upload_url }}" | grep -oP "[^ ]*\.yml|[^ ]*\.blockmap"); do
+            echo "Removing $file"
+            gh release delete "${{ github.ref_name }}" --force --yes "$file"
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
