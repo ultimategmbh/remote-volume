@@ -28,6 +28,8 @@ jobs:
         run: npm run build # Customize this as needed to build your app
 
       - name: Package Electron app
+        env:
+          GH_TOKEN: ${{  secrets.GH_TOKEN }}
         run: |
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
             npx electron-builder --linux
