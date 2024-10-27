@@ -12,11 +12,6 @@
 	},
 	"build": {
 		"appId": "com.utsgmbh.volumeremote",
-		"files": [
-			"**/*",
-			"!**/*.yml",
-			"!**/*.blockmap"
-		],
 		"mac": {
 			"target": [
 				{

@@ -27,3 +27,8 @@ jobs:
         with:
           github_token: ${{ secrets.GH_TOKEN }}
           release: true
+
+      - name: Clean up .blockmap and .yml files
+        run: |
+          find . -name '*.blockmap' -type f -delete
+          find . -name '*.yml' -type f -delete
