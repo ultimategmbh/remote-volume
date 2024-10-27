@@ -17,6 +17,10 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
+      - name: Get tag name
+        id: get_tag
+        run: echo "TAG_NAME=${{ github.ref_name }} >> $GITHUB_ENV
+
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
@@ -27,10 +31,6 @@ jobs:
         with:
           github_token: ${{ secrets.GH_TOKEN }}
           release: true
-
-      - name: Get tag name
-        id: get_tag
-        run: echo "TAG_NAME=${{ github.ref_name }} >> $GITHUB_ENV
 
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
