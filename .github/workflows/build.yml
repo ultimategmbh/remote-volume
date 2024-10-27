@@ -32,14 +32,7 @@ jobs:
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ secrets.GH_TOKEN }}
-          tag: 'v1.0.0'
+          tag: ${GITHUB_REF#refs/tags/}
           assets: |
             *.yml
             *.blockmap
-
-      - name: Publish release
-        uses: eregon/publish-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          release_id: 'v1.0.0'
