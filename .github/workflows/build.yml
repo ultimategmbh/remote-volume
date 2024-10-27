@@ -26,8 +26,8 @@ jobs:
 
       - name: Package Electron app for macOS
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --mac --publish=never
+          GH_TOKEN: 'DUMMY_VALUE' # Set a dummy value here
+        run: npx electron-builder --mac --publish=never --config.extraMetadata.publish=false
 
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v3
@@ -55,8 +55,8 @@ jobs:
 
       - name: Package Electron app for Windows
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --win --publish=never
+          GH_TOKEN: 'DUMMY_VALUE' # Set a dummy value here
+        run: npx electron-builder --win --publish=never --config.extraMetadata.publish=false
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v3
@@ -84,8 +84,8 @@ jobs:
 
       - name: Package Electron app for Linux
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --linux --publish=never
+          GH_TOKEN: 'DUMMY_VALUE' # Set a dummy value here
+        run: npx electron-builder --linux --publish=never --config.extraMetadata.publish=false
 
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v3
