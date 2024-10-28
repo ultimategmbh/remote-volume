@@ -199,56 +199,67 @@ if (!gotLock) {
 
 		wss = new WebSocketServer({ port })
 
-		wss.on('connection', (ws) => {
+		wss.on('connection', async (ws) => {
 			console.log('Client connected')
-			ws.send(JSON.stringify({ volume: lastVolume, muted: lastMuteState }))
+			const currentVolume = await getVolume()
+			const currentMuteState = await isMuted()
+			ws.send(JSON.stringify({ volume: currentVolume, muted: currentMuteState }))
 
 			ws.on('message', async (message) => {
 				try {
 					const { action, value } = JSON.parse(message)
 					let response
 
-					switch (action) {
-						case 'setVolume':
-							response = await setVolume(value)
-							break
-						case 'getVolume':
-							response = await getVolume()
-							break
-						case 'increaseVolume':
-							response = await increaseVolume(value)
-							break
-						case 'decreaseVolume':
-							response = await decreaseVolume(value)
-							break
-						case 'mute':
-							response = await mute()
-							break
-						case 'unmute':
-							response = await unmute()
-							break
-						case 'toggleMute':
-							response = await toggleMute()
-							break
-						case 'isMuted':
-							response = await isMuted()
-							break
-						default:
-							response = { error: 'Invalid action' }
+					// Map actions to corresponding functions
+					const actions = {
+						setVolume: async () => {
+							// Check if value is in the range 0-100
+							if (typeof value !== 'number' || value < 0 || value > 100) {
+								return { error: 'Invalid value for setVolume. Must be between 0 and 100.' }
+							}
+							return setVolume(value)
+						},
+						getState: async () => {
+							const currentVolume = await getVolume()
+							const currentMuteState = await isMuted()
+							return { volume: currentVolume, muted: currentMuteState }
+						},
+						increaseVolume: async () => {
+							if (typeof value !== 'number' || value < 1 || value > 99) {
+								return { error: 'Invalid value for increaseVolume. Must be between 1 and 99.' }
+							}
+							return increaseVolume(value)
+						},
+						decreaseVolume: async () => {
+							if (typeof value !== 'number' || value < 1 || value > 99) {
+								return { error: 'Invalid value for decreaseVolume. Must be between 1 and 99.' }
+							}
+							return decreaseVolume(value)
+						},
+						mute: () => mute(),
+						unmute: () => unmute(),
+						toggleMute: () => toggleMute(),
 					}
 
-					// Send a response based on polling configuration
-					if (config.polling.enabled) {
-						// Only respond with an error if the action was invalid
-						if (response?.error) {
-							ws.send(JSON.stringify({ action, response }))
+					if (actions[action]) {
+						response = await actions[action]()
+
+						if (config.polling.enabled) {
+							if (response?.error) {
+								ws.send(JSON.stringify({ action, response }))
+							}
+						} else {
+							if (action === 'getState') {
+								ws.send(JSON.stringify(response))
+							} else {
+								const currentVolume = await getVolume()
+								const currentMuteState = await isMuted()
+								ws.send(JSON.stringify({ volume: currentVolume, muted: currentMuteState }))
+							}
 						}
-						// Valid actions will be broadcasted via polling, no need to respond
 					} else {
-						// If polling is disabled, send the current volume and mute state
-						const currentVolume = await getVolume()
-						const currentMuteState = await isMuted()
-						ws.send(JSON.stringify({ action, response, volume: currentVolume, muted: currentMuteState }))
+						response = { error: 'Invalid action' }
+						ws.send(JSON.stringify({ action, response }))
 					}
 				} catch (error) {
 					console.error('Error processing message:', error)
