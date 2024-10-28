@@ -22,7 +22,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '22' # Adjust the Node version if needed
+          node-version: '22'
 
       # Step 3: Install dependencies
       - name: Install dependencies
@@ -38,18 +38,12 @@ jobs:
       - name: Build the Electron app
         run: npm run build
 
-      # Step 6: Upload artifacts for each OS build
-      - name: Upload build artifacts
-        run: |
-          mkdir -p ./upload
-          cp ./dist/*.{dmg,exe,deb} ./upload/ || true
-        shell: bash
-
+      # Step 6: Upload artifacts with their original names
       - name: Upload artifacts to GitHub
         uses: actions/upload-artifact@v3
         with:
-          name: build-${{ matrix.os }}
-          path: ./upload/
+          name: build-artifacts
+          path: ./dist/*.{dmg,exe,deb} # All files in their original names
 
   # Release job, runs only after all OS builds are complete
   release:
@@ -61,7 +55,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: build-${{ matrix.os }}
+          name: build-artifacts
           path: ./dist
 
       # Step 2: Create GitHub Release
