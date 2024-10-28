@@ -121,7 +121,7 @@ if (!gotLock) {
 			},
 		])
 
-		tray.setToolTip('Your Application Name')
+		tray.setToolTip('Remote Volume')
 		tray.setContextMenu(contextMenu)
 
 		await setAutoLaunch(config.runOnStartup)
@@ -237,8 +237,18 @@ if (!gotLock) {
 							response = { error: 'Invalid action' }
 					}
 
-					if (response !== undefined) {
-						ws.send(JSON.stringify({ action, response }))
+					// Send a response based on polling configuration
+					if (config.polling.enabled) {
+						// Only respond with an error if the action was invalid
+						if (response?.error) {
+							ws.send(JSON.stringify({ action, response }))
+						}
+						// Valid actions will be broadcasted via polling, no need to respond
+					} else {
+						// If polling is disabled, send the current volume and mute state
+						const currentVolume = await getVolume()
+						const currentMuteState = await isMuted()
+						ws.send(JSON.stringify({ action, response, volume: currentVolume, muted: currentMuteState }))
 					}
 				} catch (error) {
 					console.error('Error processing message:', error)
