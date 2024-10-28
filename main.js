@@ -42,7 +42,7 @@ if (!gotLock) {
 	}
 
 	const appAutoLauncher = new AutoLaunch({
-		name: 'Remote Volume',
+		name: 'RemoteVolume',
 	})
 
 	const setAutoLaunch = async (enabled) => {
