@@ -30,11 +30,13 @@ jobs:
       # Step 4: Get version from package.json
       - name: Get version
         id: version
-        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
+        run: |
+          echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
+          echo "version=$(jq -r .version package.json)"
 
       # Step 5: Run the build
       - name: Build the Electron app
-        run: electron-builder
+        run: npm run build
 
       # Step 6: Upload artifacts
       - name: Upload build artifacts
