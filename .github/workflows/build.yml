@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [windows-latest, macos-latest]
 
     steps:
       # Step 1: Check out the repository
@@ -39,17 +39,11 @@ jobs:
         run: npm run build
 
       # Step 6: Upload artifacts for each OS build
-      - name: Upload build artifacts
-        run: |
-          mkdir -p ./upload
-          cp ./dist/*.{dmg,exe,deb} ./upload/ || true
-        shell: bash
-
       - name: Upload artifacts to GitHub
         uses: actions/upload-artifact@v3
         with:
           name: build-${{ matrix.os }}
-          path: ./upload/
+          path: ./dist/*.{dmg,exe,deb}
 
   # Release job, runs only after all OS builds are complete
   release:
