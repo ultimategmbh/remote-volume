@@ -58,23 +58,9 @@ if (!gotLock) {
 		if (enabled) {
 			await appAutoLauncher.enable()
 			log.info('Auto-launch enabled successfully.')
-			// const isEnabled = await appAutoLauncher.isEnabled()
-			// if (!isEnabled) {
-			// 	await appAutoLauncher.enable()
-			// 	log.info('Auto-launch enabled successfully.')
-			// } else {
-			// 	log.info('Auto-launch was already enabled.')
-			// }
 		} else {
 			await appAutoLauncher.disable()
 			log.info('Auto-launch disabled successfully.')
-			// const isEnabled = await appAutoLauncher.isEnabled()
-			// if (isEnabled) {
-			// 	await appAutoLauncher.disable()
-			// 	log.info('Auto-launch disabled successfully.')
-			// } else {
-			// 	log.info('Auto-launch was already disabled.')
-			// }
 		}
 	}
 
