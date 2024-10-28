@@ -3,62 +3,62 @@ name: Build and Release
 on:
   push:
     branches:
-      - main # Adjust the branch as needed
+      - main
 
 jobs:
-  # OS-specific job for building and packaging
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
-      # Step 1: Check out the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '22'
+          node-version: '18' # Downgraded to ensure compatibility
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Step 4: Get version from package.json
       - name: Get version
         id: version
         run: |
           echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
 
-      # Step 5: Run the build
       - name: Build the Electron app
         run: npm run build
 
-      # Step 6: Upload artifacts with their original names
+      - name: Verify dist directory contents
+        run: ls -l dist
+
+      - name: Wait for files to be finalized
+        run: sleep 10
+
       - name: Upload artifacts to GitHub
         uses: actions/upload-artifact@v3
         with:
-          name: build-artifacts
-          path: dist/*.{dmg,exe,deb} # All files in their original names
+          name: build-artifacts-${{ matrix.os }}
+          path: |
+            dist/*.dmg
+            dist/*.exe
+            dist/*.deb
+          if-no-files-found: warn
 
-  # Release job, runs only after all OS builds are complete
   release:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Download all artifacts from the previous build jobs
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: build-artifacts
+          name: build-artifacts-${{ matrix.os }}
           path: ./dist
 
-      # Step 2: Create GitHub Release
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v1
