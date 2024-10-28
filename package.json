@@ -12,6 +12,7 @@
 	},
 	"build": {
 		"appId": "com.utsgmbh.volumeremote",
+		"publish": "never",
 		"mac": {
 			"target": [
 				{
