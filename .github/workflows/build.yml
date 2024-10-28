@@ -55,19 +55,19 @@ jobs:
       - name: Download MacOS artifacts
         uses: actions/download-artifact@v4
         with:
-          name: artifact-macos-latest
+          name: build-artifacts-macos-latest
           path: ./dist
 
       - name: Download Windows artifacts
         uses: actions/download-artifact@v4
         with:
-          name: artifact-windows-latest
+          name: build-artifacts-windows-latest
           path: ./dist
 
       - name: Download Linux artifacts
         uses: actions/download-artifact@v4
         with:
-          name: artifact-ubuntu-latest
+          name: build-artifacts-ubuntu-latest
           path: ./dist
 
       - name: Create GitHub Release
