@@ -1,7 +1,7 @@
 {
-	"name": "volume-remote",
+	"name": "remote-volume",
 	"version": "1.0.0",
-	"description": "A small application for controlling the system volume over a WebSocket connection",
+	"description": "An application for controlling the system volume over a WebSocket connection",
 	"main": "main.js",
 	"type": "module",
 	"displayName": "Remote Volume",
@@ -12,6 +12,7 @@
 	},
 	"build": {
 		"appId": "com.utsgmbh.volumeremote",
+		"productName": "Remote Volume",
 		"publish": null,
 		"mac": {
 			"target": [
@@ -30,7 +31,7 @@
 				{
 					"target": "nsis",
 					"arch": [
-						"x64"
+						"arm64"
 					]
 				}
 			],
@@ -54,6 +55,7 @@
 	"dependencies": {
 		"auto-launch": "^5.0.6",
 		"electron-auto-launch": "^5.0.7",
+		"electron-log": "^5.2.0",
 		"electron-store": "^10.0.0",
 		"execa": "4.0.3",
 		"os": "^0.1.2",

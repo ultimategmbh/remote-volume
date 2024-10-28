@@ -136,13 +136,13 @@
 
 			const saveConfig = () => {
 				const port = parseInt(document.getElementById('port').value, 10)
-				const runOnStartup = document.getElementById('runOnStartup').checked
+				const runOnStartupVal = document.getElementById('runOnStartup').checked
 				const enablePolling = document.getElementById('enablePolling').checked
 				const pollingInterval = enablePolling ? parseInt(document.getElementById('pollingInterval').value, 10) : null
 
 				window.electron.send('save-config', {
 					websocket: { port },
-					runOnStartup,
+					runOnStartup: runOnStartupVal,
 					polling: { enabled: enablePolling, interval: pollingInterval },
 				})
 			}
