@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Downgraded to ensure compatibility
+          node-version: '22'
 
       - name: Install dependencies
         run: npm install
@@ -32,16 +32,10 @@ jobs:
       - name: Build the Electron app
         run: npm run build
 
-      - name: Verify dist directory contents
-        run: ls -l dist
-
-      - name: Wait for files to be finalized
-        run: sleep 10
-
       - name: Upload artifacts to GitHub
         uses: actions/upload-artifact@v3
         with:
-          name: build-artifacts-${{ matrix.os }}
+          name: build-artifacts
           path: |
             dist/*.dmg
             dist/*.exe
@@ -56,14 +50,17 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: build-artifacts-${{ matrix.os }}
+          name: build-artifacts
           path: ./dist
 
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./dist/*.{dmg,exe,deb}
+          files: |
+            dist/*.dmg
+            dist/*.exe
+            dist/*.deb
           tag_name: v${{ env.version }}-${{ github.sha }}
           name: 'Release v${{ env.version }}-${{ github.sha }}'
           body: |
