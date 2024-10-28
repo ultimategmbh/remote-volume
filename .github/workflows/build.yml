@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
-          path: ./dist/*.{dmg,exe,deb} # All files in their original names
+          path: dist/*.{dmg,exe,deb} # All files in their original names
 
   # Release job, runs only after all OS builds are complete
   release:
