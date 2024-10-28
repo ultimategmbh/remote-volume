@@ -34,7 +34,7 @@ jobs:
 
       # Step 5: Run the build
       - name: Build the Electron app
-        run: electron-build
+        run: electron-builder
 
       # Step 6: Upload artifacts
       - name: Upload build artifacts
