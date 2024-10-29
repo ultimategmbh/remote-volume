@@ -14,8 +14,8 @@
 		"appId": "com.utsgmbh.volumeremote",
 		"productName": "Remote Volume",
 		"publish": null,
-		"notarize": false,
 		"mac": {
+			"notarize": false,
 			"target": [
 				{
 					"target": "dmg",
