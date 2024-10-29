@@ -44,6 +44,9 @@ jobs:
           security list-keychain -d user -s $KEYCHAIN_PATH
 
       - name: Build the Electron app
+        env:
+          APPLEID: ${{ secrets.APPLE_ID }}
+          APPLEIDPASS: ${{ secrets.APPLE_APPLICATION_PASSWORD }}
         run: npm run build
 
       - name: Upload artifacts to GitHub
