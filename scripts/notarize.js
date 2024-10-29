@@ -10,7 +10,7 @@ export default async function notarizing(context) {
 
 	return await notarize({
 		tool: 'notarytool',
-		teamId: process.env.APPLE_TEAM_ID,
+		teamId: 'JA5ZC58PQ9',
 		appBundleId: 'uts.remotevolume.app',
 		appPath: `${appOutDir}/${appName}.app`,
 		appleId: process.env.APPLEID,
