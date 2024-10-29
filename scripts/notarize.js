@@ -16,7 +16,7 @@ export default async function notarizing(context) {
 
 	const appPath = `${appOutDir}/${appName}.app`
 	const { APPLE_ID, APPLE_ID_PASSWORD, APPLE_TEAM_ID } = process.env
-	console.log(`  • Notarizing ${appPath}`)
+	console.log('Starting notarization!')
 
 	return await notarize({
 		tool: 'notarytool',
