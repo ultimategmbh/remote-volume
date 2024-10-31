@@ -4,9 +4,6 @@ export default async function notarizing(context) {
 	const appName = context.packager.appInfo.productFilename
 	const { electronPlatformName, appOutDir } = context
 
-	// We skip notarization if the process is not running on MacOS and
-	// if the environment variable SKIP_NOTARIZE is set to `true`
-	// This is useful for local testing where notarization is useless
 	if (electronPlatformName !== 'darwin') {
 		console.log('Skipping notarization')
 		return
