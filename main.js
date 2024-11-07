@@ -146,6 +146,7 @@ if (!gotLock) {
 			log.info('Received save-config event from renderer.')
 			config = newConfig
 			store.set('settings', config)
+			mainWindow.webContents.send('load-config', config)
 			event.reply('config-saved', 'Configuration saved successfully!')
 			log.info('Configuration saved to store and confirmation sent to renderer.')
 			log.info('RunOnStartup: ' + config.runOnStartup)
