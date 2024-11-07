@@ -140,12 +140,20 @@
 				const enablePolling = document.getElementById('enablePolling').checked
 				const pollingInterval = parseInt(document.getElementById('pollingInterval').value, 10)
 
-				if (enablePolling && pollingInterval < 100) {
-					pollingInterval = 100
+				if (isNaN(port) || port < 1 || port > 65535) {
+					port = 2501
+					document.getElementById('port').value = port
 				}
 
-				if (enablePolling && pollingInterval > 10000) {
-					pollingInterval = 10000
+				if (enablePolling) {
+					if (isNaN(pollingInterval) || pollingInterval === 0) {
+						pollingInterval = 500
+					} else if (pollingInterval < 100) {
+						pollingInterval = 100
+					} else if (pollingInterval > 10000) {
+						pollingInterval = 10000
+					}
+					document.getElementById('pollingInterval').value = pollingInterval
 				}
 
 				window.electron.send('save-config', {
