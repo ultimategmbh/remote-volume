@@ -115,7 +115,7 @@
 			</label>
 			<br />
 			<label for="pollingInterval">Polling Interval (ms):</label>
-			<input type="number" id="pollingInterval" value="1000" disabled />
+			<input type="number" id="pollingInterval" value="1000" min="100" max="10000" disabled />
 			<br />
 			<button id="save">Save</button>
 
@@ -139,6 +139,14 @@
 				const runOnStartupVal = document.getElementById('runOnStartup').checked
 				const enablePolling = document.getElementById('enablePolling').checked
 				const pollingInterval = parseInt(document.getElementById('pollingInterval').value, 10)
+
+				if (enablePolling && pollingInterval < 100) {
+					pollingInterval = 100
+				}
+
+				if (enablePolling && pollingInterval > 10000) {
+					pollingInterval = 10000
+				}
 
 				window.electron.send('save-config', {
 					websocket: { port },
