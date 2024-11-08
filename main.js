@@ -55,14 +55,32 @@ if (!gotLock) {
 
 	const setAutoLaunch = async (enabled) => {
 		log.info(`Auto-start setting changed. Attempting to ${enabled ? 'enable' : 'disable'} auto-launch.`)
-		if (enabled) {
-			await appAutoLauncher.enable()
-			log.info('Auto-launch enabled successfully.')
-		} else {
-			await appAutoLauncher.disable()
-			log.info('Auto-launch disabled successfully.')
+	  
+		try {
+		  if (process.platform === 'linux' ) {
+			const appAutoLauncher = new AutoLaunch({
+				name: 'RemoteVolume',
+				path: app.getPath('exe'),
+			  })
+		
+			  if (enabled) {
+				await appAutoLauncher.enable()
+				log.info('Auto-launch enabled on Linux.')
+			  } else {
+				await appAutoLauncher.disable()
+				log.info('Auto-launch disabled on Linux.')
+			  }
+		  } else {
+			app.setLoginItemSettings({
+			  openAtLogin: enabled,  // Enables/disables auto-launch on startup
+			  openAsHidden: true,   // Show the app when it starts (set to true to run in background)
+			})
+			log.info(`Auto-launch ${enabled ? 'enabled' : 'disabled'} on macOS.`)
+		  }
+		} catch (error) {
+		  log.error('Failed to change auto-launch setting:', error)
 		}
-	}
+	  }
 
 	let mainWindow
 	let tray
