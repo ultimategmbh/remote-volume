@@ -32,7 +32,9 @@ if (!gotLock) {
 	app.quit()
 } else {
 	let wss
-	const store = new Store()
+	const store = new Store({
+  		cwd: app.getPath('userData') // Make sure settings are stored in the correct location
+	})
 	const currentVersion = '1.0.0'
 
 	let config = store.get('settings') || {
