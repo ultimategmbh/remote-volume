@@ -55,32 +55,32 @@ if (!gotLock) {
 
 	const setAutoLaunch = async (enabled) => {
 		log.info(`Auto-start setting changed. Attempting to ${enabled ? 'enable' : 'disable'} auto-launch.`)
-	  
+
 		try {
-		  if (process.platform === 'linux' ) {
-			const appAutoLauncher = new AutoLaunch({
-				name: 'RemoteVolume',
-				path: app.getPath('exe'),
-			  })
-		
-			  if (enabled) {
-				await appAutoLauncher.enable()
-				log.info('Auto-launch enabled on Linux.')
-			  } else {
-				await appAutoLauncher.disable()
-				log.info('Auto-launch disabled on Linux.')
-			  }
-		  } else {
-			app.setLoginItemSettings({
-			  openAtLogin: enabled,  // Enables/disables auto-launch on startup
-			  openAsHidden: true,   // Show the app when it starts (set to true to run in background)
-			})
-			log.info(`Auto-launch ${enabled ? 'enabled' : 'disabled'} on macOS.`)
-		  }
+			if (process.platform === 'linux') {
+				const appAutoLauncher = new AutoLaunch({
+					name: 'RemoteVolume',
+					path: app.getPath('exe'),
+				})
+
+				if (enabled) {
+					await appAutoLauncher.enable()
+					log.info('Auto-launch enabled on Linux.')
+				} else {
+					await appAutoLauncher.disable()
+					log.info('Auto-launch disabled on Linux.')
+				}
+			} else {
+				app.setLoginItemSettings({
+					openAtLogin: enabled,
+					openAsHidden: true,
+				})
+				log.info(`Auto-launch ${enabled ? 'enabled' : 'disabled'} on macOS.`)
+			}
 		} catch (error) {
-		  log.error('Failed to change auto-launch setting:', error)
+			log.error('Failed to change auto-launch setting:', error)
 		}
-	  }
+	}
 
 	let mainWindow
 	let tray
@@ -100,7 +100,6 @@ if (!gotLock) {
 		})
 
 		mainWindow.loadFile('index.html')
-		log.info('Main window created and index.html loaded.')
 
 		mainWindow.setMenu(null)
 
@@ -108,7 +107,6 @@ if (!gotLock) {
 			if (!app.isQuiting) {
 				event.preventDefault()
 				mainWindow.hide()
-				log.info('Main window hidden (close prevented).')
 			}
 		})
 
@@ -117,7 +115,6 @@ if (!gotLock) {
 				createWindow()
 			} else {
 				mainWindow.show()
-				log.info('Main window shown on app activation.')
 			}
 		})
 	}
@@ -126,11 +123,9 @@ if (!gotLock) {
 		createWindow()
 		if (os.platform() === 'darwin') {
 			app.dock.hide()
-			log.info('Dock icon hidden on macOS.')
 		}
 		mainWindow.webContents.on('did-finish-load', () => {
 			mainWindow.webContents.send('load-config', config)
-			log.info('Configuration sent to renderer process.')
 		})
 
 		tray = new Tray(path.join(__dirname, 'menuicon.png'))
@@ -139,7 +134,6 @@ if (!gotLock) {
 				label: 'Show App',
 				click: () => {
 					mainWindow.show()
-					log.info('Show App clicked from tray menu.')
 				},
 			},
 			{
@@ -147,27 +141,21 @@ if (!gotLock) {
 				click: () => {
 					app.isQuiting = true
 					app.quit()
-					log.info('Quit clicked from tray menu.')
 				},
 			},
 		])
 
 		tray.setToolTip('Remote Volume')
 		tray.setContextMenu(contextMenu)
-		log.info('Tray icon and context menu set up.')
-		log.info('RunOnStartup: ' + config.runOnStartup)
 		await setAutoLaunch(config.runOnStartup)
 		startWebSocketServer()
 		startMonitoring()
 
 		ipcMain.on('save-config', async (event, newConfig) => {
-			log.info('Received save-config event from renderer.')
 			config = newConfig
 			store.set('settings', config)
 			mainWindow.webContents.send('load-config', config)
 			event.reply('config-saved', 'Configuration saved successfully!')
-			log.info('Configuration saved to store and confirmation sent to renderer.')
-			log.info('RunOnStartup: ' + config.runOnStartup)
 			await setAutoLaunch(config.runOnStartup)
 
 			if (wss) {
@@ -204,13 +192,11 @@ if (!gotLock) {
 					if (currentVolume !== lastVolume) {
 						lastVolume = currentVolume
 						broadcastState({ volume: currentVolume })
-						log.info(`Volume changed to ${currentVolume}. Broadcasted to clients.`)
 					}
 
 					if (currentMuteState !== lastMuteState) {
 						lastMuteState = currentMuteState
 						broadcastState({ muted: currentMuteState })
-						log.info(`Mute state changed to ${currentMuteState}. Broadcasted to clients.`)
 					}
 				} catch (error) {
 					log.error('Error monitoring volume/mute state:', error)
@@ -224,7 +210,6 @@ if (!gotLock) {
 			wss.clients.forEach((client) => {
 				if (client.readyState === client.OPEN) {
 					client.send(JSON.stringify(state))
-					log.info(`Broadcasted state: ${JSON.stringify(state)} to a client.`)
 				}
 			})
 		}
@@ -242,7 +227,6 @@ if (!gotLock) {
 		log.info(`WebSocket server started on ws://localhost:${port}`)
 
 		wss.on('connection', async (ws) => {
-			log.info('Client connected to WebSocket.')
 			const currentVolume = await getVolume()
 			const currentMuteState = await isMuted()
 			ws.send(JSON.stringify({ volume: currentVolume, muted: currentMuteState }))
@@ -250,7 +234,6 @@ if (!gotLock) {
 			ws.on('message', async (message) => {
 				try {
 					const { action, value } = JSON.parse(message)
-					log.info(`Received message from client: action=${action}, value=${value}`)
 					let response
 
 					const actions = {
@@ -287,22 +270,18 @@ if (!gotLock) {
 
 					if (actions[action]) {
 						response = await actions[action]()
-						log.info(`Action ${action} executed with result: ${JSON.stringify(response)}`)
 
 						if (config.polling.enabled) {
 							if (response?.error) {
 								ws.send(JSON.stringify({ action, response }))
-								log.info(`Sent error response for action ${action}: ${response.error}`)
 							}
 						} else {
 							if (action === 'getState') {
 								ws.send(JSON.stringify(response))
-								log.info('Sent state response to client.')
 							} else {
 								const currentVolume = await getVolume()
 								const currentMuteState = await isMuted()
 								ws.send(JSON.stringify({ volume: currentVolume, muted: currentMuteState }))
-								log.info('Sent updated volume/mute state to client.')
 							}
 						}
 					} else {
@@ -327,7 +306,6 @@ if (!gotLock) {
 	app.on('window-all-closed', () => {
 		if (process.platform !== 'darwin') {
 			app.quit()
-			log.info('All windows closed. App quitting.')
 		}
 	})
 }
