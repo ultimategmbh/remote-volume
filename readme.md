@@ -43,12 +43,13 @@ When using [Bitfocus Companion](https://bitfocus.io/companion) you don't need th
 
 - **Action**: `setVolume`
 - **Description**: Sets the system volume to a specified level.
+- **Value Range**: 0 - 100
 - **Payload**:
 
   ```json
   {
     "action": "setVolume",
-    "value": <number>  // Volume level (0-100)
+    "value": <number>
   }
   ```
 
@@ -67,11 +68,12 @@ When using [Bitfocus Companion](https://bitfocus.io/companion) you don't need th
 
 - **Action**: `increaseVolume`
 - **Description**: Increases the system volume by a specified increment.
+- **Value Range**: 1 - 99
 - **Payload**:
   ```json
   {
   	"action": "increaseVolume",
-    "value": <number>  // Increment amount (1-99)
+    "value": <number>
   }
   ```
 
@@ -79,11 +81,12 @@ When using [Bitfocus Companion](https://bitfocus.io/companion) you don't need th
 
 - **Action**: `decreaseVolume`
 - **Description**: Decreases the system volume by a specified decrement.
+- **Value Range**: 1 - 99
 - **Payload**:
   ```json
   {
   	"action": "decreaseVolume",
-    "value": <number>  // Decrement amount (1-99)
+    "value": <number>
   }
   ```
 
