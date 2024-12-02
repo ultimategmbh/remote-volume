@@ -22,6 +22,7 @@ export async function getAudioDevice() {
 	const defaultHostAPI = hostAPIs.defaultHostAPI
 	const defaultOutput = hostAPIs.HostAPIs[hostAPIs.defaultHostAPI].defaultOutput
 	const outputName = devices[defaultOutput].name
+
 	return outputName
 }
 
