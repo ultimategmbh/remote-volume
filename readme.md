@@ -137,7 +137,7 @@ When using [Bitfocus Companion](https://bitfocus.io/companion) you don't need th
 ## Credits
 
 The main part for controlling the system volume is based on the following project:
-https://github.com/LinusU/node-loudness
+https://github.com/LinusU/node-loudness.
 
 This application can be controlled by [Bitfocus Companion](https://bitfocus.io/companion)
 
