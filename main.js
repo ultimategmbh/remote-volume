@@ -281,19 +281,23 @@ if (!gotLock) {
 					if (actions[action]) {
 						response = await actions[action]()
 
-						if (config.polling.enabled) {
-							if (response?.error) {
-								ws.send(JSON.stringify({ action, response }))
-							}
+						if (response?.error) {
+							ws.send(JSON.stringify({ action, response }))
 						} else {
-							if (action === 'getState') {
-								ws.send(JSON.stringify(response))
-							} else {
-								const currentVolume = await getVolume()
-								const currentMuteState = await isMuted()
-								ws.send(JSON.stringify({ volume: currentVolume, muted: currentMuteState }))
-							}
+							if (action == 'getState') ws.send(JSON.stringify(response))
 						}
+
+						// if (config.polling.enabled) {
+						// } else {
+						// 	if (action === 'getState') {
+						// 		console.log('Received getState B')
+						// 		ws.send(JSON.stringify(response))
+						// 	} else {
+						// 		const currentVolume = await getVolume()
+						// 		const currentMuteState = await isMuted()
+						// 		ws.send(JSON.stringify({ volume: currentVolume, muted: currentMuteState }))
+						// 	}
+						// }
 					} else {
 						response = { error: 'Invalid action' }
 						ws.send(JSON.stringify({ action, response }))
