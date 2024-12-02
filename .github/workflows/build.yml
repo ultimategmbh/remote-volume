@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     branches:
-      - main
+      - '**'
 
 jobs:
   build:
@@ -64,6 +64,7 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
