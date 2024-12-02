@@ -1,9 +1,10 @@
-import os from 'os' // Use import instead of require
+import os from 'os'
+import { getDevices, getHostAPIs } from '@capaj/naudiodon'
 let impl = null
 
 switch (os.type()) {
 	case 'Darwin':
-		impl = await import('./impl/darwin.js') // Use dynamic import for the platform-specific implementations
+		impl = await import('./impl/darwin.js')
 		break
 	case 'Linux':
 		impl = await import('./impl/linux.js')
@@ -13,6 +14,16 @@ switch (os.type()) {
 		break
 	default:
 		throw new Error('Your OS is currently not supported by node-loudness.')
+}
+
+export async function getAudioDevice() {
+	const devices = getDevices()
+	const hostAPIs = getHostAPIs()
+	const defaultHostAPI = hostAPIs.defaultHostAPI
+	const defaultOutput = hostAPIs.HostAPIs[hostAPIs.defaultHostAPI].defaultOutput
+	const outputName = devices[defaultOutput].name
+
+	return outputName
 }
 
 export async function setVolume(value) {
@@ -42,12 +53,12 @@ export async function isMuted() {
 
 export async function increaseVolume(amount) {
 	const currentVolume = await impl.getVolume()
-	const newVolume = Math.min(currentVolume + amount, 100) // cap at 100
+	const newVolume = Math.min(currentVolume + amount, 100)
 	return impl.setVolume(newVolume)
 }
 
 export async function decreaseVolume(amount) {
 	const currentVolume = await impl.getVolume()
-	const newVolume = Math.max(currentVolume - amount, 0) // cap at 0
+	const newVolume = Math.max(currentVolume - amount, 0)
 	return impl.setVolume(newVolume)
 }

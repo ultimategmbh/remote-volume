@@ -6,6 +6,7 @@ This small Electron application enables you to control the OS audio volume over 
 
 - Get, set, increase or decrease the audio volume
 - Get, mute, unmute or toggle the mute state of the audio volume
+- Get the current audio output device
 
 The application has an built in feature to poll the system audio values (volume and mute state) - this can be enabled or disabled in the configuration window (you can also define a polling interval).
 As soon as something changes, the updated values will be sent out to all connected WebSocket clients.
@@ -53,14 +54,14 @@ When using [Bitfocus Companion](https://bitfocus.io/companion) you don't need th
   }
   ```
 
-### 2. Get Volume
+### 2. Get State
 
-- **Action**: `getVolume`
-- **Description**: Returns the current system volume.
+- **Action**: `g`
+- **Description**: Returns all current audio information
 - **Payload**:
   ```json
   {
-  	"action": "getVolume"
+  	"action": "getState"
   }
   ```
 
@@ -137,7 +138,7 @@ When using [Bitfocus Companion](https://bitfocus.io/companion) you don't need th
 ## Credits
 
 The main part for controlling the system volume is based on the following project:
-https://github.com/LinusU/node-loudness
+https://github.com/LinusU/node-loudness.
 
 This application can be controlled by [Bitfocus Companion](https://bitfocus.io/companion)
 
