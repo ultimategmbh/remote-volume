@@ -23,7 +23,7 @@ jobs:
 
       - name: Install python setuptools
         run: |
-          brew install setuptools
+          brew install python-setuptools
 
       - name: Install dependencies
         run: npm install
