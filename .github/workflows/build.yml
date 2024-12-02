@@ -23,7 +23,7 @@ jobs:
 
       - name: Upgrade setuptools
         run: |
-          pip install setuptools
+          pip3 install setuptools
 
       - name: Install dependencies
         run: npm install
