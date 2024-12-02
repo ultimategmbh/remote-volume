@@ -21,9 +21,15 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install python setuptools
+      - name: Install Python setuptools (macOS specific)
+        if: runner.os == 'macOS'
         run: |
           brew install python-setuptools
+
+      - name: Install Python setuptools (Linux/Windows specific)
+        if: runner.os == 'Linux' || runner.os == 'Windows'
+        run: |
+          python3 -m pip install --upgrade setuptools
 
       - name: Install dependencies
         run: npm install
