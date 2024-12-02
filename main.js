@@ -16,6 +16,7 @@ import {
 	isMuted,
 	increaseVolume,
 	decreaseVolume,
+	getAudioDevice,
 } from './volumeController.js'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -177,6 +178,7 @@ if (!gotLock) {
 
 	let lastVolume = null
 	let lastMuteState = null
+	let lastAudioDevice = null
 	let pollingInterval = null
 
 	function startMonitoring() {
@@ -188,6 +190,7 @@ if (!gotLock) {
 				try {
 					const currentVolume = await getVolume()
 					const currentMuteState = await isMuted()
+					const currentAudioDevice = await getAudioDevice()
 
 					if (currentVolume !== lastVolume) {
 						lastVolume = currentVolume
@@ -197,6 +200,11 @@ if (!gotLock) {
 					if (currentMuteState !== lastMuteState) {
 						lastMuteState = currentMuteState
 						broadcastState({ muted: currentMuteState })
+					}
+
+					if (currentAudioDevice != lastAudioDevice) {
+						lastAudioDevice = currentAudioDevice
+						broadcastState({ outputDevice: currentAudioDevice })
 					}
 				} catch (error) {
 					log.error('Error monitoring volume/mute state:', error)
@@ -229,7 +237,8 @@ if (!gotLock) {
 		wss.on('connection', async (ws) => {
 			const currentVolume = await getVolume()
 			const currentMuteState = await isMuted()
-			ws.send(JSON.stringify({ volume: currentVolume, muted: currentMuteState }))
+			const currentAudioDevice = await getAudioDevice()
+			ws.send(JSON.stringify({ volume: currentVolume, muted: currentMuteState, outputDevice: currentAudioDevice }))
 
 			ws.on('message', async (message) => {
 				try {
@@ -247,7 +256,8 @@ if (!gotLock) {
 						getState: async () => {
 							const currentVolume = await getVolume()
 							const currentMuteState = await isMuted()
-							return { volume: currentVolume, muted: currentMuteState }
+							const currentAudioDevice = await getAudioDevice()
+							return { volume: currentVolume, muted: currentMuteState, outputDevice: currentAudioDevice }
 						},
 						increaseVolume: async () => {
 							if (typeof value !== 'number' || value < 1 || value > 99) {
