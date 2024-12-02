@@ -21,9 +21,9 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Upgrade setuptools
+      - name: Install python setuptools
         run: |
-          pip3 install setuptools
+          brew install setuptools
 
       - name: Install dependencies
         run: npm install
