@@ -33,7 +33,6 @@
 				{
 					"target": "nsis",
 					"arch": [
-						"arm64",
 						"x64"
 					]
 				}
@@ -62,6 +61,7 @@
 		"electron-log": "^5.2.0",
 		"electron-store": "^10.0.0",
 		"execa": "4.0.3",
+		"naudiodon": "^2.3.6",
 		"os": "^0.1.2",
 		"ws": "^8.18.0"
 	},
